@@ -24,9 +24,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		8E8FDFE52EE4C7240035E171 /* Slack.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Slack.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		8E8FDFF22EE4C7250035E171 /* SlackTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SlackTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		8E8FDFFC2EE4C7250035E171 /* SlackUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SlackUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		8E8FDFE52EE4C7240035E171 /* Stack.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Stack.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8E8FDFF22EE4C7250035E171 /* StackTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StackTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		8E8FDFFC2EE4C7250035E171 /* StackUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StackUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -85,9 +85,9 @@
 		8E8FDFE62EE4C7240035E171 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				8E8FDFE52EE4C7240035E171 /* Slack.app */,
-				8E8FDFF22EE4C7250035E171 /* SlackTests.xctest */,
-				8E8FDFFC2EE4C7250035E171 /* SlackUITests.xctest */,
+				8E8FDFE52EE4C7240035E171 /* Stack.app */,
+				8E8FDFF22EE4C7250035E171 /* StackTests.xctest */,
+				8E8FDFFC2EE4C7250035E171 /* StackUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -95,9 +95,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		8E8FDFE42EE4C7240035E171 /* Slack */ = {
+		8E8FDFE42EE4C7240035E171 /* Stack */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 8E8FE0062EE4C7250035E171 /* Build configuration list for PBXNativeTarget "Slack" */;
+			buildConfigurationList = 8E8FE0062EE4C7250035E171 /* Build configuration list for PBXNativeTarget "Stack" */;
 			buildPhases = (
 				8E8FDFE12EE4C7240035E171 /* Sources */,
 				8E8FDFE22EE4C7240035E171 /* Frameworks */,
@@ -110,16 +110,16 @@
 			fileSystemSynchronizedGroups = (
 				8E8FDFE72EE4C7240035E171 /* Slack */,
 			);
-			name = Slack;
+			name = Stack;
 			packageProductDependencies = (
 			);
 			productName = Slack;
-			productReference = 8E8FDFE52EE4C7240035E171 /* Slack.app */;
+			productReference = 8E8FDFE52EE4C7240035E171 /* Stack.app */;
 			productType = "com.apple.product-type.application";
 		};
-		8E8FDFF12EE4C7250035E171 /* SlackTests */ = {
+		8E8FDFF12EE4C7250035E171 /* StackTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 8E8FE0092EE4C7250035E171 /* Build configuration list for PBXNativeTarget "SlackTests" */;
+			buildConfigurationList = 8E8FE0092EE4C7250035E171 /* Build configuration list for PBXNativeTarget "StackTests" */;
 			buildPhases = (
 				8E8FDFEE2EE4C7250035E171 /* Sources */,
 				8E8FDFEF2EE4C7250035E171 /* Frameworks */,
@@ -133,16 +133,16 @@
 			fileSystemSynchronizedGroups = (
 				8E8FDFF52EE4C7250035E171 /* SlackTests */,
 			);
-			name = SlackTests;
+			name = StackTests;
 			packageProductDependencies = (
 			);
 			productName = SlackTests;
-			productReference = 8E8FDFF22EE4C7250035E171 /* SlackTests.xctest */;
+			productReference = 8E8FDFF22EE4C7250035E171 /* StackTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		8E8FDFFB2EE4C7250035E171 /* SlackUITests */ = {
+		8E8FDFFB2EE4C7250035E171 /* StackUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 8E8FE00C2EE4C7250035E171 /* Build configuration list for PBXNativeTarget "SlackUITests" */;
+			buildConfigurationList = 8E8FE00C2EE4C7250035E171 /* Build configuration list for PBXNativeTarget "StackUITests" */;
 			buildPhases = (
 				8E8FDFF82EE4C7250035E171 /* Sources */,
 				8E8FDFF92EE4C7250035E171 /* Frameworks */,
@@ -156,11 +156,11 @@
 			fileSystemSynchronizedGroups = (
 				8E8FDFFF2EE4C7250035E171 /* SlackUITests */,
 			);
-			name = SlackUITests;
+			name = StackUITests;
 			packageProductDependencies = (
 			);
 			productName = SlackUITests;
-			productReference = 8E8FDFFC2EE4C7250035E171 /* SlackUITests.xctest */;
+			productReference = 8E8FDFFC2EE4C7250035E171 /* StackUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -186,7 +186,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 8E8FDFE02EE4C7240035E171 /* Build configuration list for PBXProject "Slack" */;
+			buildConfigurationList = 8E8FDFE02EE4C7240035E171 /* Build configuration list for PBXProject "Stack" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -200,9 +200,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				8E8FDFE42EE4C7240035E171 /* Slack */,
-				8E8FDFF12EE4C7250035E171 /* SlackTests */,
-				8E8FDFFB2EE4C7250035E171 /* SlackUITests */,
+				8E8FDFE42EE4C7240035E171 /* Stack */,
+				8E8FDFF12EE4C7250035E171 /* StackTests */,
+				8E8FDFFB2EE4C7250035E171 /* StackUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -258,12 +258,12 @@
 /* Begin PBXTargetDependency section */
 		8E8FDFF42EE4C7250035E171 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 8E8FDFE42EE4C7240035E171 /* Slack */;
+			target = 8E8FDFE42EE4C7240035E171 /* Stack */;
 			targetProxy = 8E8FDFF32EE4C7250035E171 /* PBXContainerItemProxy */;
 		};
 		8E8FDFFE2EE4C7250035E171 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 8E8FDFE42EE4C7240035E171 /* Slack */;
+			target = 8E8FDFE42EE4C7240035E171 /* Stack */;
 			targetProxy = 8E8FDFFD2EE4C7250035E171 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -390,6 +390,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 3RZ4V2CJ68;
@@ -414,7 +415,9 @@
 				MACOSX_DEPLOYMENT_TARGET = 26.1;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.flow.Slack;
+				"PRODUCT_BUNDLE_IDENTIFIER[sdk=iphoneos*]" = com.flow.stack;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -434,6 +437,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 3RZ4V2CJ68;
@@ -458,7 +462,9 @@
 				MACOSX_DEPLOYMENT_TARGET = 26.1;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.flow.Slack;
+				"PRODUCT_BUNDLE_IDENTIFIER[sdk=iphoneos*]" = com.flow.stack;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -494,7 +500,7 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Slack.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Slack";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Stack.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Stack";
 				XROS_DEPLOYMENT_TARGET = 26.1;
 			};
 			name = Debug;
@@ -520,7 +526,7 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Slack.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Slack";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Stack.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Stack";
 				XROS_DEPLOYMENT_TARGET = 26.1;
 			};
 			name = Release;
@@ -578,7 +584,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		8E8FDFE02EE4C7240035E171 /* Build configuration list for PBXProject "Slack" */ = {
+		8E8FDFE02EE4C7240035E171 /* Build configuration list for PBXProject "Stack" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				8E8FE0042EE4C7250035E171 /* Debug */,
@@ -587,7 +593,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		8E8FE0062EE4C7250035E171 /* Build configuration list for PBXNativeTarget "Slack" */ = {
+		8E8FE0062EE4C7250035E171 /* Build configuration list for PBXNativeTarget "Stack" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				8E8FE0072EE4C7250035E171 /* Debug */,
@@ -596,7 +602,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		8E8FE0092EE4C7250035E171 /* Build configuration list for PBXNativeTarget "SlackTests" */ = {
+		8E8FE0092EE4C7250035E171 /* Build configuration list for PBXNativeTarget "StackTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				8E8FE00A2EE4C7250035E171 /* Debug */,
@@ -605,7 +611,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		8E8FE00C2EE4C7250035E171 /* Build configuration list for PBXNativeTarget "SlackUITests" */ = {
+		8E8FE00C2EE4C7250035E171 /* Build configuration list for PBXNativeTarget "StackUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				8E8FE00D2EE4C7250035E171 /* Debug */,
