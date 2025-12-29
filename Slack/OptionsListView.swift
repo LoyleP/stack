@@ -96,14 +96,22 @@ struct OptionsListView: View {
     }
     
     func addOption() {
-        guard !newOptionText.isEmpty else { return }
-        let newItem = Item(text: newOptionText, colorName: Theme.randomColorName())
-        
-        withAnimation(.spring()) {
-            items.insert(newItem, at: 0)
+            guard !newOptionText.isEmpty else { return }
+            
+            // NEW: Check for duplicates
+            let isDuplicate = items.contains { $0.text.localizedCaseInsensitiveCompare(newOptionText) == .orderedSame }
+            if isDuplicate {
+                newOptionText = ""
+                return
+            }
+            
+            let newItem = Item(text: newOptionText, colorName: Theme.randomColorName())
+            
+            withAnimation(.spring()) {
+                items.insert(newItem, at: 0)
+            }
+            newOptionText = ""
         }
-        newOptionText = ""
-    }
     
     func deleteItem(_ item: Item) {
         withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {

@@ -237,17 +237,27 @@ struct DeckView: View {
     }
     
     func addOption() {
-        guard !newOptionText.isEmpty else { return }
-        Haptics.shared.play(.heavy)
-        let newItem = Item(text: newOptionText, colorName: Theme.randomColorName())
-        
-        withAnimation(Orbit.gravity) {
-            items.insert(newItem, at: 0)
-            showInput = false
+            guard !newOptionText.isEmpty else { return }
+            
+            // NEW: Check for duplicates (case-insensitive)
+            let isDuplicate = items.contains { $0.text.localizedCaseInsensitiveCompare(newOptionText) == .orderedSame }
+            if isDuplicate {
+                // Optional: Trigger a "warning" haptic if you like
+                Haptics.shared.play(.light)
+                newOptionText = "" // Clear the text so they can try again
+                return
+            }
+
+            Haptics.shared.play(.heavy)
+            let newItem = Item(text: newOptionText, colorName: Theme.randomColorName())
+            
+            withAnimation(Orbit.gravity) {
+                items.insert(newItem, at: 0)
+                showInput = false
+            }
+            newOptionText = ""
+            hideKeyboard()
         }
-        newOptionText = ""
-        hideKeyboard()
-    }
 }
 
 // --- SPARKLE COMPONENT ---
