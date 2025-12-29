@@ -4,118 +4,77 @@ struct OptionsListView: View {
     @Binding var items: [Item]
     @Environment(\.dismiss) var dismiss
     @State private var newOptionText = ""
-    
+
     var body: some View {
-        NavigationStack {
-            ZStack {
-                Color(red: 0.12, green: 0.12, blue: 0.12).ignoresSafeArea()
-                
-                VStack(spacing: 0) {
-                    
-                    // HEADER
-                    HStack {
-                        Spacer()
-                        Button(action: { dismiss() }) {
-                            Image(systemName: "checkmark")
-                        }
-                        .buttonStyle(.orbitGlass)
+        ZStack {
+            // Panel Background
+            Color(red: 0.1, green: 0.1, blue: 0.1).ignoresSafeArea()
+            
+            VStack(spacing: 20) {
+                // Header Row
+                HStack {
+                    Spacer()
+                    Button(action: { dismiss() }) {
+                        Image(systemName: "checkmark")
                     }
-                    .padding(.top, 20)
-                    .padding(.horizontal, 20)
-                    .padding(.bottom, 10)
-                    
-                    // LIST
+                    .buttonStyle(.orbitGlass)
+                }
+                
+                // Content Area
+                VStack {
                     if items.isEmpty {
-                        VStack(spacing: 20) {
-                            Spacer()
+                        Spacer()
+                        VStack(spacing: 16) {
                             Image(systemName: "square.stack.3d.up.slash")
                                 .font(.system(size: 60))
                                 .foregroundStyle(.white.opacity(0.2))
                             Text("Your deck is empty.")
                                 .font(Orbit.headingFont())
                                 .foregroundStyle(.white.opacity(0.5))
-                            Spacer()
                         }
+                        Spacer()
                     } else {
-                        List {
-                            ForEach(items) { item in
-                                HStack(spacing: 16) {
-                                    Circle()
-                                        .fill(item.color)
-                                        .frame(width: 14, height: 14)
-                                        .shadow(color: item.color.opacity(0.6), radius: 4, x: 0, y: 0)
-                                    
-                                    Text(item.text)
-                                        .font(Orbit.bodyFont())
-                                        .foregroundStyle(.white)
-                                    
-                                    Spacer()
-                                    
-                                    Button(action: { deleteItem(item) }) {
-                                        Image(systemName: "xmark")
-                                            .font(.system(size: 12, weight: .bold))
-                                            .foregroundStyle(.white.opacity(0.7))
-                                            .frame(width: 32, height: 32)
-                                            .background(Color.white.opacity(0.1))
-                                            .clipShape(Circle())
-                                    }
-                                    .buttonStyle(.plain)
+                        ScrollView {
+                            LazyVStack(spacing: 12) {
+                                ForEach(items) { item in
+                                    itemRow(for: item)
                                 }
-                                .padding(.vertical, 12)
-                                .padding(.leading, 20)
-                                .padding(.trailing, 12)
-                                .background(Orbit.glassMaterial)
-                                .clipShape(Capsule())
-                                .overlay(
-                                    Capsule().stroke(Orbit.glassBorder, lineWidth: Orbit.glassBorderWidth)
-                                )
-                                .listRowInsets(EdgeInsets(top: 6, leading: 20, bottom: 6, trailing: 20))
-                                .listRowBackground(Color.clear)
-                                .listRowSeparator(.hidden)
                             }
                         }
-                        .listStyle(.plain)
-                        .scrollContentBackground(.hidden)
-                        // THE UX FIX: Dismiss keyboard when dragging list
-                        .scrollDismissesKeyboard(.interactively)
                     }
-                    
-                    // INPUT BAR
-                    ControlBar(
-                        text: $newOptionText,
-                        onAdd: addOption,
-                        onShuffle: {}
-                    )
-                    .padding(.bottom, 10)
-                    .padding(.top, 10)
                 }
+                
+                // Input Bar at the bottom of the panel
+                ControlBar(text: $newOptionText, onAdd: addOption, onShuffle: {})
             }
-            .toolbar(.hidden, for: .navigationBar)
+            .padding(16) // Consistent 16px padding all around
         }
         .preferredColorScheme(.dark)
     }
-    
+
+    // Helper for individual item rows
+    func itemRow(for item: Item) -> some View {
+        HStack(spacing: 16) {
+            Circle().fill(item.color).frame(width: 14, height: 14)
+            Text(item.text).font(Orbit.bodyFont()).foregroundStyle(.white)
+            Spacer()
+            Button(action: { withAnimation { items.removeAll { $0.id == item.id } } }) {
+                Image(systemName: "xmark.circle.fill").foregroundStyle(.white.opacity(0.3))
+            }
+        }
+        .padding(.vertical, 12).padding(.horizontal, 20)
+        .background(.ultraThinMaterial)
+        .clipShape(Capsule())
+        .overlay(Capsule().stroke(.white.opacity(0.2), lineWidth: 1))
+    }
+
     func addOption() {
-            guard !newOptionText.isEmpty else { return }
-            
-            // NEW: Check for duplicates
-            let isDuplicate = items.contains { $0.text.localizedCaseInsensitiveCompare(newOptionText) == .orderedSame }
-            if isDuplicate {
-                newOptionText = ""
-                return
-            }
-            
-            let newItem = Item(text: newOptionText, colorName: Theme.randomColorName())
-            
-            withAnimation(.spring()) {
-                items.insert(newItem, at: 0)
-            }
-            newOptionText = ""
+        guard !newOptionText.isEmpty else { return }
+        if items.contains(where: { $0.text.localizedCaseInsensitiveCompare(newOptionText) == .orderedSame }) {
+            newOptionText = ""; return
         }
-    
-    func deleteItem(_ item: Item) {
-        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-            items.removeAll { $0.id == item.id }
-        }
+        let newItem = Item(text: newOptionText, colorName: Theme.randomColorName())
+        withAnimation(.spring()) { items.insert(newItem, at: 0) }
+        newOptionText = ""
     }
 }

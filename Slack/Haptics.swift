@@ -2,28 +2,18 @@ import UIKit
 
 class Haptics {
     static let shared = Haptics()
+    private let light = UIImpactFeedbackGenerator(style: .light)
+    private let medium = UIImpactFeedbackGenerator(style: .medium)
+    private let heavy = UIImpactFeedbackGenerator(style: .heavy)
     
-    private let lightGenerator = UIImpactFeedbackGenerator(style: .light)
-    private let mediumGenerator = UIImpactFeedbackGenerator(style: .medium)
-    private let heavyGenerator = UIImpactFeedbackGenerator(style: .heavy)
-    
-    init() {
-        // "Prepare" reduces the latency (lag) of the first vibration
-        lightGenerator.prepare()
-        mediumGenerator.prepare()
-        heavyGenerator.prepare()
-    }
+    init() { light.prepare(); medium.prepare(); heavy.prepare() }
     
     func play(_ style: UIImpactFeedbackGenerator.FeedbackStyle) {
         switch style {
-        case .light:
-            lightGenerator.impactOccurred()
-        case .medium:
-            mediumGenerator.impactOccurred()
-        case .heavy:
-            heavyGenerator.impactOccurred()
-        default:
-            mediumGenerator.impactOccurred()
+        case .light: light.impactOccurred()
+        case .medium: medium.impactOccurred()
+        case .heavy: heavy.impactOccurred()
+        default: medium.impactOccurred()
         }
     }
 }
