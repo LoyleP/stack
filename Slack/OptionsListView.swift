@@ -35,7 +35,7 @@ struct OptionsListView: View {
                         Spacer()
                     } else {
                         ScrollView {
-                            LazyVStack(spacing: 12) {
+                            LazyVStack(spacing: 16) { // Comfortably spaced
                                 ForEach(items) { item in
                                     itemRow(for: item)
                                 }
@@ -47,22 +47,36 @@ struct OptionsListView: View {
                 // Input Bar at the bottom of the panel
                 ControlBar(text: $newOptionText, onAdd: addOption, onShuffle: {})
             }
-            .padding(16) // Consistent 16px padding all around
+            .padding(16) // 16px all-around padding preserved
         }
         .preferredColorScheme(.dark)
     }
 
-    // Helper for individual item rows
+    // UPDATED: Cleaned itemRow (No Context Menu)
     func itemRow(for item: Item) -> some View {
         HStack(spacing: 16) {
-            Circle().fill(item.color).frame(width: 14, height: 14)
-            Text(item.text).font(Orbit.bodyFont()).foregroundStyle(.white)
+            // Larger color circle (22px)
+            Circle()
+                .fill(item.color)
+                .frame(width: 22, height: 22)
+                .shadow(color: item.color.opacity(0.6), radius: 4)
+
+            Text(item.text)
+                .font(Orbit.bodyFont())
+                .foregroundStyle(.white)
+            
             Spacer()
+            
+            // Larger cross button (22px)
             Button(action: { withAnimation { items.removeAll { $0.id == item.id } } }) {
-                Image(systemName: "xmark.circle.fill").foregroundStyle(.white.opacity(0.3))
+                Image(systemName: "xmark.circle.fill")
+                    .font(.system(size: 22))
+                    .foregroundStyle(.white.opacity(0.3))
             }
+            .buttonStyle(.plain)
         }
-        .padding(.vertical, 12).padding(.horizontal, 20)
+        .padding(.vertical, 16) // Increased row height preserved
+        .padding(.horizontal, 20)
         .background(.ultraThinMaterial)
         .clipShape(Capsule())
         .overlay(Capsule().stroke(.white.opacity(0.2), lineWidth: 1))

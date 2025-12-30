@@ -3,7 +3,7 @@ import SwiftUI
 struct Item: Identifiable, Codable, Equatable {
     let id: UUID
     let text: String
-    let colorName: String
+    let colorName: String // Reverted to let
     let rotation: Double
     
     var color: Color { Theme.color(for: colorName) }
