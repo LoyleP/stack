@@ -8,19 +8,19 @@ struct CardView: View {
         ZStack {
             RoundedRectangle(cornerRadius: 32, style: .continuous)
                 .fill(Theme.gradient(for: color))
-                .shadow(color: color.opacity(0.3), radius: 20, x: 0, y: 10)
+                .shadow(color: color.opacity(0.3), radius: 25, x: 0, y: 12)
                 .overlay(
                     RoundedRectangle(cornerRadius: 32, style: .continuous)
-                        .stroke(.white.opacity(0.3), lineWidth: 1.5)
+                        .stroke(.white.opacity(0.2), lineWidth: 1.5)
                 )
             
             Text(text)
-                .font(.system(size: 40, weight: .black, design: .rounded))
+                .font(.system(size: 40, weight: .bold, design: .rounded))
                 .foregroundStyle(.white)
                 .multilineTextAlignment(.center)
                 .padding(30)
-                .minimumScaleFactor(0.4) // Allows longer text to shrink
+                .minimumScaleFactor(0.4)
         }
-        .frame(width: 310, height: 420) // Reduced height for keyboard safety
+        .frame(width: 320, height: 460)
     }
 }
