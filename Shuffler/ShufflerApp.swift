@@ -1,10 +1,18 @@
 import SwiftUI
 
 @main
-struct ShufflerApp: App { // Renamed from StackApp
+struct ShufflerApp: App {
+    @AppStorage("hasSeenOnboarding") var hasSeenOnboarding: Bool = false
+    
     var body: some Scene {
         WindowGroup {
-            DeckView()
+            if hasSeenOnboarding {
+                DeckView()
+                    .transition(.opacity.combined(with: .scale))
+            } else {
+                OnboardingView()
+                    .transition(.opacity)
+            }
         }
     }
 }

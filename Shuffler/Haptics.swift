@@ -34,4 +34,8 @@ class Haptics {
     func shuffleSuccess() {
         heavy.impactOccurred()
     }
+    
+    func selectionRemoved() {
+            medium.impactOccurred()
+    }
 }
