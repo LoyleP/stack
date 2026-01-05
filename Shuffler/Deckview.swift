@@ -6,7 +6,6 @@ struct DeckView: View {
            let decoded = try? JSONDecoder().decode([Item].self, from: data) {
             return decoded
         }
-        // Logic: [Bottom Card, ..., Top Card]
         return [Item(text: "Non", colorName: "terracotta"), Item(text: "Oui", colorName: "denim")]
     }()
     
@@ -18,17 +17,15 @@ struct DeckView: View {
     @State private var isKeyboardVisible = false
     @State private var usedSessionColors: Set<String> = []
     
-    // Manual Gesture State
     @State private var dragOffset: CGSize = .zero
-    
-    // NEW: Individual card offsets for the "Swing and Tuck" shuffle
+    @State private var activeShuffleId: UUID? = nil
     @State private var cardOffsets: [UUID: CGFloat] = [:]
     
     @State private var isHolding = false
     @State private var isTapping = false
-    @State private var shuffleTimer: Timer? = nil
     @State private var originalTopId: UUID? = nil
     @State private var lastPressTime: Date = Date()
+    @State private var shuffleTask: Task<Void, Never>? = nil
     
     @FocusState private var isInputFocused: Bool
 
@@ -36,6 +33,8 @@ struct DeckView: View {
         ZStack {
             backgroundLayer
             cardLayer
+                .ignoresSafeArea()
+                .offset(y: -20)
             headerLayer
             controlLayer
         }
@@ -53,7 +52,6 @@ struct DeckView: View {
     // --- LAYERS ---
 
     private var backgroundLayer: some View {
-        // Tweak: Background now tracks the TOP card (last in array)
         LinearGradient(
             colors: [
                 items.last?.color.opacity(0.35) ?? .gray.opacity(0.1),
@@ -74,22 +72,19 @@ struct DeckView: View {
             } else {
                 SparkleView(trigger: $sparkleTrigger).zIndex(-10)
                 
-                // Render from first to last (last is on top)
                 ForEach(items) { item in
                     CardView(text: item.text, color: item.color)
                         .rotationEffect(getRotation(for: item))
                         .offset(getOffset(for: item))
                         .scaleEffect(getScale(for: item))
-                        .blur(radius: isShuffling ? 10 : 0)
-                        // Gesture only enabled for the top card (last item)
-                        .gesture(item.id == items.last?.id ? dragGesture : nil)
+                        .blur(radius: isShuffling ? 6 : 0)
+                        .zIndex(item.id == activeShuffleId ? 1000 : Double(items.firstIndex(where: { $0.id == item.id }) ?? 0))
+                        .gesture(item.id == items.last?.id && !isShuffling ? dragGesture : nil)
                 }
             }
         }
         .scaleEffect(isKeyboardVisible ? 0.7 : 1.0)
         .animation(.spring(response: 0.4, dampingFraction: 0.8), value: isKeyboardVisible)
-        .ignoresSafeArea(.keyboard)
-        // Spring handling the front-to-back cycling
         .animation(.spring(response: 0.4, dampingFraction: 0.75), value: items.map { $0.id })
     }
 
@@ -100,43 +95,38 @@ struct DeckView: View {
         }
     }
 
-    // --- REFACTORED GEOMETRY ---
+    // --- GEOMETRY ---
 
     func getOffset(for item: Item) -> CGSize {
         var x = cardOffsets[item.id] ?? 0
         var y: CGFloat = 0
-        
-        if item.id == items.last?.id {
+        if item.id == items.last?.id && !isShuffling {
             x += dragOffset.width
             y += dragOffset.height
         }
-        
-        return CGSize(width: x, height: y) // Fixed labels
+        return CGSize(width: x, height: y)
     }
 
     func getRotation(for item: Item) -> Angle {
         var rot = item.rotation
-        if item.id == items.last?.id {
+        if item.id == items.last?.id && !isShuffling {
             rot += Double(dragOffset.width / 15)
         }
-        // Add swing rotation
         if let x = cardOffsets[item.id] {
-            rot += Double(x / 20)
+            rot += Double(x / 18)
         }
         return .degrees(rot)
     }
 
     func getScale(for item: Item) -> CGFloat {
-        // Determine position from top (last item)
         guard let index = items.firstIndex(where: { $0.id == item.id }) else { return 1.0 }
         let distanceToTop = items.count - 1 - index
-        
         let baseScale = 1.0 - (CGFloat(distanceToTop) * 0.03)
-        if item.id == items.last?.id && dragOffset != .zero { return baseScale + 0.02 }
+        if item.id == items.last?.id && dragOffset != .zero && !isShuffling { return baseScale + 0.02 }
         return baseScale
     }
 
-    // --- LOGIC: THE SWING AND TUCK SHUFFLE ---
+    // --- SHUFFLE LOGIC ---
 
     func startContinuousShuffle() {
         guard !items.isEmpty && !isShuffling else { return }
@@ -144,45 +134,60 @@ struct DeckView: View {
         
         withAnimation(.interactiveSpring()) { dragOffset = .zero }
         withAnimation(.easeInOut(duration: 0.2)) { isShuffling = true }
-        Haptics.shared.play(.medium)
+        
+        // REFACTORED: Use centralized haptic call
+        Haptics.shared.shuffleStart()
 
-        shuffleTimer = Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) { _ in
-            guard let topItem = items.last else { return }
-            let id = topItem.id
-            
-            // 1. Swing current top card to the right
-            withAnimation(.spring(response: 0.2, dampingFraction: 0.7)) {
-                cardOffsets[id] = 400
-            }
-            
-            // 2. Mid-swing: Move to bottom of array (front of list)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                Haptics.shared.play(.light)
-                let card = items.removeLast()
-                items.insert(card, at: 0)
+        shuffleTask = Task { @MainActor in
+            while !Task.isCancelled {
+                guard let topItem = items.last else { break }
+                let idToMove = topItem.id
                 
-                // 3. Snap back to center while at the bottom
-                withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                    cardOffsets[id] = 0
+                withAnimation(.spring(response: 0.25, dampingFraction: 0.7)) {
+                    activeShuffleId = idToMove
+                    cardOffsets[idToMove] = 450
                 }
+                
+                try? await Task.sleep(nanoseconds: 120_000_000)
+                
+                // REFACTORED: Use centralized haptic call
+                Haptics.shared.shuffleTuck()
+                
+                if let index = items.firstIndex(where: { $0.id == idToMove }) {
+                    let card = items.remove(at: index)
+                    items.insert(card, at: 0)
+                }
+                
+                withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
+                    cardOffsets[idToMove] = 0
+                }
+                
+                try? await Task.sleep(nanoseconds: 150_000_000)
+                activeShuffleId = nil
             }
         }
     }
 
     func endContinuousShuffle() {
         guard isShuffling else { return }
-        shuffleTimer?.invalidate(); shuffleTimer = nil
-        Haptics.shared.play(.heavy)
+        shuffleTask?.cancel()
+        shuffleTask = nil
+        
+        // REFACTORED: Use centralized haptic call
+        Haptics.shared.shuffleSuccess()
 
         let candidates = items.filter { $0.id != originalTopId }
         let winner = (candidates.randomElement() ?? items.randomElement())!
         var remaining = items.filter { $0.id != winner.id }; remaining.shuffle()
         
-        withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
-            items = remaining + [winner] // Winner is last (top)
-            isShuffling = false; isTapping = false
+        withAnimation(.spring(response: 0.6, dampingFraction: 0.7)) {
+            items = remaining + [winner]
+            isShuffling = false
+            isTapping = false
             cardOffsets.removeAll()
+            activeShuffleId = nil
         }
+        
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { sparkleTrigger += 1 }
     }
 
@@ -201,6 +206,7 @@ struct DeckView: View {
                         dragOffset.width = 1000 * direction
                     }
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                        // Manual card cycle still uses light feedback
                         Haptics.shared.play(.light)
                         let card = items.removeLast()
                         items.insert(card, at: 0)
@@ -251,7 +257,7 @@ struct DeckView: View {
                                 withAnimation(Orbit.touch) { isHolding = false }
                                 if Date().timeIntervalSince(lastPressTime) < 0.2 {
                                     withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) { isTapping = true }
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { endContinuousShuffle() }
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { endContinuousShuffle() }
                                 } else { endContinuousShuffle() }
                             }
                     )
@@ -263,12 +269,25 @@ struct DeckView: View {
     }
 
     private var headerLayer: some View {
-        VStack { HStack { Button(action: { showList = true }) { Image(systemName: "list.bullet") }.buttonStyle(.orbitGlass); Spacer() }.padding(.horizontal, 20).padding(.top, 8); Spacer() }.ignoresSafeArea(.keyboard)
+        VStack {
+            HStack {
+                Button(action: { showList = true }) { Image(systemName: "list.bullet") }
+                    .buttonStyle(.orbitGlass)
+                Spacer()
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 8)
+            Spacer()
+        }
+        .ignoresSafeArea(.keyboard)
     }
 
     func performShortShuffle() {
-        withAnimation { isTapping = true }
-        startContinuousShuffle(); DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) { endContinuousShuffle() }
+        if !isShuffling {
+            withAnimation { isTapping = true }
+            startContinuousShuffle()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) { endContinuousShuffle() }
+        }
     }
 
     func addOption() {
@@ -277,7 +296,6 @@ struct DeckView: View {
         let available = Theme.colorNames.filter { !usedSessionColors.contains($0) }
         let picked = (available.isEmpty ? Theme.colorNames : available).randomElement() ?? "denim"
         usedSessionColors.insert(picked)
-        // Add new items to the END (Top of stack)
         withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
             items.append(Item(text: newOptionText, colorName: picked))
         }
@@ -286,4 +304,8 @@ struct DeckView: View {
     
     func hideKeyboard() { UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil) }
     func saveItems() { if let data = try? JSONEncoder().encode(items) { UserDefaults.standard.set(data, forKey: "savedItems") } }
+}
+
+#Preview {
+    DeckView()
 }

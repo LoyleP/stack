@@ -24,25 +24,25 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		8E8FDFE52EE4C7240035E171 /* Stack.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Stack.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		8E8FDFF22EE4C7250035E171 /* StackTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StackTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		8E8FDFFC2EE4C7250035E171 /* StackUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StackUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		8E8FDFE52EE4C7240035E171 /* Shuffler.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Shuffler.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8E8FDFF22EE4C7250035E171 /* ShufflerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ShufflerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		8E8FDFFC2EE4C7250035E171 /* ShufflerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ShufflerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		8E8FDFE72EE4C7240035E171 /* Slack */ = {
+		8E8FDFE72EE4C7240035E171 /* Shuffler */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Slack;
+			path = Shuffler;
 			sourceTree = "<group>";
 		};
-		8E8FDFF52EE4C7250035E171 /* SlackTests */ = {
+		8E8FDFF52EE4C7250035E171 /* ShufflerTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = SlackTests;
+			path = ShufflerTests;
 			sourceTree = "<group>";
 		};
-		8E8FDFFF2EE4C7250035E171 /* SlackUITests */ = {
+		8E8FDFFF2EE4C7250035E171 /* ShufflerUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = SlackUITests;
+			path = ShufflerUITests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -75,9 +75,9 @@
 		8E8FDFDC2EE4C7240035E171 = {
 			isa = PBXGroup;
 			children = (
-				8E8FDFE72EE4C7240035E171 /* Slack */,
-				8E8FDFF52EE4C7250035E171 /* SlackTests */,
-				8E8FDFFF2EE4C7250035E171 /* SlackUITests */,
+				8E8FDFE72EE4C7240035E171 /* Shuffler */,
+				8E8FDFF52EE4C7250035E171 /* ShufflerTests */,
+				8E8FDFFF2EE4C7250035E171 /* ShufflerUITests */,
 				8E8FDFE62EE4C7240035E171 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -85,9 +85,9 @@
 		8E8FDFE62EE4C7240035E171 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				8E8FDFE52EE4C7240035E171 /* Stack.app */,
-				8E8FDFF22EE4C7250035E171 /* StackTests.xctest */,
-				8E8FDFFC2EE4C7250035E171 /* StackUITests.xctest */,
+				8E8FDFE52EE4C7240035E171 /* Shuffler.app */,
+				8E8FDFF22EE4C7250035E171 /* ShufflerTests.xctest */,
+				8E8FDFFC2EE4C7250035E171 /* ShufflerUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -95,9 +95,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		8E8FDFE42EE4C7240035E171 /* Stack */ = {
+		8E8FDFE42EE4C7240035E171 /* Shuffler */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 8E8FE0062EE4C7250035E171 /* Build configuration list for PBXNativeTarget "Stack" */;
+			buildConfigurationList = 8E8FE0062EE4C7250035E171 /* Build configuration list for PBXNativeTarget "Shuffler" */;
 			buildPhases = (
 				8E8FDFE12EE4C7240035E171 /* Sources */,
 				8E8FDFE22EE4C7240035E171 /* Frameworks */,
@@ -108,18 +108,18 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				8E8FDFE72EE4C7240035E171 /* Slack */,
+				8E8FDFE72EE4C7240035E171 /* Shuffler */,
 			);
-			name = Stack;
+			name = Shuffler;
 			packageProductDependencies = (
 			);
 			productName = Slack;
-			productReference = 8E8FDFE52EE4C7240035E171 /* Stack.app */;
+			productReference = 8E8FDFE52EE4C7240035E171 /* Shuffler.app */;
 			productType = "com.apple.product-type.application";
 		};
-		8E8FDFF12EE4C7250035E171 /* StackTests */ = {
+		8E8FDFF12EE4C7250035E171 /* ShufflerTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 8E8FE0092EE4C7250035E171 /* Build configuration list for PBXNativeTarget "StackTests" */;
+			buildConfigurationList = 8E8FE0092EE4C7250035E171 /* Build configuration list for PBXNativeTarget "ShufflerTests" */;
 			buildPhases = (
 				8E8FDFEE2EE4C7250035E171 /* Sources */,
 				8E8FDFEF2EE4C7250035E171 /* Frameworks */,
@@ -131,18 +131,18 @@
 				8E8FDFF42EE4C7250035E171 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				8E8FDFF52EE4C7250035E171 /* SlackTests */,
+				8E8FDFF52EE4C7250035E171 /* ShufflerTests */,
 			);
-			name = StackTests;
+			name = ShufflerTests;
 			packageProductDependencies = (
 			);
 			productName = SlackTests;
-			productReference = 8E8FDFF22EE4C7250035E171 /* StackTests.xctest */;
+			productReference = 8E8FDFF22EE4C7250035E171 /* ShufflerTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		8E8FDFFB2EE4C7250035E171 /* StackUITests */ = {
+		8E8FDFFB2EE4C7250035E171 /* ShufflerUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 8E8FE00C2EE4C7250035E171 /* Build configuration list for PBXNativeTarget "StackUITests" */;
+			buildConfigurationList = 8E8FE00C2EE4C7250035E171 /* Build configuration list for PBXNativeTarget "ShufflerUITests" */;
 			buildPhases = (
 				8E8FDFF82EE4C7250035E171 /* Sources */,
 				8E8FDFF92EE4C7250035E171 /* Frameworks */,
@@ -154,13 +154,13 @@
 				8E8FDFFE2EE4C7250035E171 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				8E8FDFFF2EE4C7250035E171 /* SlackUITests */,
+				8E8FDFFF2EE4C7250035E171 /* ShufflerUITests */,
 			);
-			name = StackUITests;
+			name = ShufflerUITests;
 			packageProductDependencies = (
 			);
 			productName = SlackUITests;
-			productReference = 8E8FDFFC2EE4C7250035E171 /* StackUITests.xctest */;
+			productReference = 8E8FDFFC2EE4C7250035E171 /* ShufflerUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -186,7 +186,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 8E8FDFE02EE4C7240035E171 /* Build configuration list for PBXProject "Stack" */;
+			buildConfigurationList = 8E8FDFE02EE4C7240035E171 /* Build configuration list for PBXProject "Shuffler" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -200,9 +200,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				8E8FDFE42EE4C7240035E171 /* Stack */,
-				8E8FDFF12EE4C7250035E171 /* StackTests */,
-				8E8FDFFB2EE4C7250035E171 /* StackUITests */,
+				8E8FDFE42EE4C7240035E171 /* Shuffler */,
+				8E8FDFF12EE4C7250035E171 /* ShufflerTests */,
+				8E8FDFFB2EE4C7250035E171 /* ShufflerUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -258,12 +258,12 @@
 /* Begin PBXTargetDependency section */
 		8E8FDFF42EE4C7250035E171 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 8E8FDFE42EE4C7240035E171 /* Stack */;
+			target = 8E8FDFE42EE4C7240035E171 /* Shuffler */;
 			targetProxy = 8E8FDFF32EE4C7250035E171 /* PBXContainerItemProxy */;
 		};
 		8E8FDFFE2EE4C7250035E171 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 8E8FDFE42EE4C7240035E171 /* Stack */;
+			target = 8E8FDFE42EE4C7240035E171 /* Shuffler */;
 			targetProxy = 8E8FDFFD2EE4C7250035E171 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -498,7 +498,7 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Stack.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Stack";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Shuffler.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Shuffler";
 				XROS_DEPLOYMENT_TARGET = 26.1;
 			};
 			name = Debug;
@@ -524,7 +524,7 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Stack.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Stack";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Shuffler.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Shuffler";
 				XROS_DEPLOYMENT_TARGET = 26.1;
 			};
 			name = Release;
@@ -582,7 +582,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		8E8FDFE02EE4C7240035E171 /* Build configuration list for PBXProject "Stack" */ = {
+		8E8FDFE02EE4C7240035E171 /* Build configuration list for PBXProject "Shuffler" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				8E8FE0042EE4C7250035E171 /* Debug */,
@@ -591,7 +591,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		8E8FE0062EE4C7250035E171 /* Build configuration list for PBXNativeTarget "Stack" */ = {
+		8E8FE0062EE4C7250035E171 /* Build configuration list for PBXNativeTarget "Shuffler" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				8E8FE0072EE4C7250035E171 /* Debug */,
@@ -600,7 +600,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		8E8FE0092EE4C7250035E171 /* Build configuration list for PBXNativeTarget "StackTests" */ = {
+		8E8FE0092EE4C7250035E171 /* Build configuration list for PBXNativeTarget "ShufflerTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				8E8FE00A2EE4C7250035E171 /* Debug */,
@@ -609,7 +609,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		8E8FE00C2EE4C7250035E171 /* Build configuration list for PBXNativeTarget "StackUITests" */ = {
+		8E8FE00C2EE4C7250035E171 /* Build configuration list for PBXNativeTarget "ShufflerUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				8E8FE00D2EE4C7250035E171 /* Debug */,
