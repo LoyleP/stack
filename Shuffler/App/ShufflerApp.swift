@@ -8,7 +8,7 @@ struct ShufflerApp: App {
         WindowGroup {
             ZStack {
                 if hasSeenOnboarding {
-                    DeckView()
+                    MainContainerView()
                         .transition(.asymmetric(insertion: .scale(scale: 0.95).combined(with: .opacity), removal: .opacity))
                 } else {
                     OnboardingView()
