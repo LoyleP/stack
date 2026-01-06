@@ -2,65 +2,71 @@ import SwiftUI
 
 struct OptionsListView: View {
     @Binding var items: [Item]
-    @Binding var isPresented: Bool
+    @Binding var isPresented: Bool // Kept for compatibility with DeckView
+    
+    @EnvironmentObject var store: DeckStore
+    @State private var showSaveDialog = false
+    @State private var deckName = ""
     @State private var newOptionText = ""
-    @State private var usedSessionColors: Set<String> = []
     @FocusState private var isInputFocused: Bool
     @State private var showClearConfirmation = false
     
     var body: some View {
         ZStack {
-            // Full screen background
             Color(red: 0.05, green: 0.06, blue: 0.07).ignoresSafeArea()
             
             VStack(spacing: 0) {
-                // Symmetrical Header (Left Align Title, Right Align Back Button)
+                // Header with Bookmark Icon
                 HStack {
                     Text("Deck Options").font(Orbit.headingFont()).foregroundStyle(.white)
                     Spacer()
-                    Button(action: { withAnimation(Orbit.Dynamics.panel) { isPresented = false } }) {
-                        Image(systemName: "chevron.right").font(.system(size: 16, weight: .bold))
-                    }.buttonStyle(.orbitGlass)
+                    
+                    if !items.isEmpty {
+                        Button(action: {
+                            _ = withAnimation(Orbit.Dynamics.element) { showSaveDialog = true }
+                        }) {
+                            Image(systemName: "bookmark.fill").font(.system(size: 16, weight: .bold))
+                        }
+                        .buttonStyle(.orbitGlass)
+                    }
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 24)
                 .padding(.bottom, 20)
                 
-                // Content
+                // Content: Separated Card Layout
                 VStack {
                     if items.isEmpty {
                         emptyState
                     } else {
-                        List {
-                            Section {
+                        ScrollView {
+                            LazyVStack(spacing: 12) {
+                                HStack {
+                                    Button("Clear All") {
+                                        _ = withAnimation(Orbit.Dynamics.element) { showClearConfirmation = true }
+                                    }
+                                    .font(.caption).foregroundStyle(.red)
+                                    Spacer()
+                                }
+                                .padding(.horizontal, 4)
+                                .padding(.bottom, 4)
+
                                 ForEach(items) { item in
                                     itemRow(for: item)
                                 }
-                                .onDelete { indexSet in
-                                    items.remove(atOffsets: indexSet)
-                                    Haptics.shared.selectionRemoved()
-                                }
-                            } header: {
-                                if !items.isEmpty {
-                                    Button("Clear All") { showClearConfirmation = true }
-                                        .font(.caption).foregroundStyle(.red)
-                                }
                             }
+                            .padding(.horizontal, 20)
                         }
-                        .listStyle(.insetGrouped)
-                        .scrollContentBackground(.hidden)
                     }
                 }
                 
-                // Floating Input Bar
                 ControlBar(text: $newOptionText, focusState: $isInputFocused, onAdd: addOption, onShuffle: {})
                     .padding(20)
             }
-            .blur(radius: showClearConfirmation ? 10 : 0)
+            .blur(radius: (showClearConfirmation || showSaveDialog) ? 10 : 0)
             
-            if showClearConfirmation {
-                clearAlertOverlay
-            }
+            if showClearConfirmation { clearAlertOverlay }
+            if showSaveDialog { saveDeckOverlay }
         }
         .preferredColorScheme(.dark)
     }
@@ -80,28 +86,80 @@ struct OptionsListView: View {
         HStack {
             Circle().fill(item.color).frame(width: 12, height: 12)
             Text(item.text).font(Orbit.bodyFont()).foregroundStyle(.white)
+            Spacer()
+            
+            Button(action: { deleteItem(item) }) {
+                Image(systemName: "xmark.circle.fill").font(.system(size: 18))
+                    .foregroundStyle(.white.opacity(0.2))
+            }
         }
-        .listRowBackground(Rectangle().fill(.ultraThinMaterial))
+        .padding(20)
+        .background(Orbit.glassMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 24, style: .continuous).stroke(Orbit.glassBorder, lineWidth: 1))
     }
 
     private var clearAlertOverlay: some View {
         ZStack {
-            Color.black.opacity(0.4).ignoresSafeArea().onTapGesture { showClearConfirmation = false }
+            Color.black.opacity(0.4).ignoresSafeArea().onTapGesture {
+                _ = withAnimation(Orbit.Dynamics.element) { showClearConfirmation = false }
+            }
             VStack(spacing: 24) {
                 Text("Clear everything?").font(Orbit.headingFont())
                 HStack(spacing: 16) {
-                    Button("Cancel") { showClearConfirmation = false }.buttonStyle(.plain)
-                    Button("Clear All") { items.removeAll(); showClearConfirmation = false }.foregroundStyle(.red)
+                    Button("Cancel") { _ = withAnimation(Orbit.Dynamics.element) { showClearConfirmation = false } }.buttonStyle(.plain)
+                    Button("Clear All") {
+                        _ = withAnimation(Orbit.Dynamics.element) {
+                            items.removeAll()
+                            showClearConfirmation = false
+                        }
+                    }.foregroundStyle(.red)
                 }
             }
             .padding(24).background(Orbit.glassMaterial).clipShape(RoundedRectangle(cornerRadius: 24))
         }
     }
 
+    private var saveDeckOverlay: some View {
+        ZStack {
+            Color.black.opacity(0.4).ignoresSafeArea().onTapGesture {
+                _ = withAnimation(Orbit.Dynamics.element) { showSaveDialog = false }
+            }
+            VStack(spacing: 20) {
+                Text("Save current deck").font(Orbit.headingFont())
+                TextField("Deck Name", text: $deckName)
+                    .padding()
+                    .background(Color.white.opacity(0.1))
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .foregroundStyle(.white)
+                
+                HStack(spacing: 16) {
+                    Button("Cancel") { _ = withAnimation(Orbit.Dynamics.element) { showSaveDialog = false } }.buttonStyle(.plain)
+                    Button("Save") {
+                        store.saveCurrentDeck(name: deckName, items: items)
+                        deckName = ""
+                        _ = withAnimation(Orbit.Dynamics.element) { showSaveDialog = false }
+                        Haptics.shared.play(.medium)
+                    }
+                    .font(.headline)
+                    .disabled(deckName.isEmpty)
+                }
+            }
+            .padding(24).background(Orbit.glassMaterial).clipShape(RoundedRectangle(cornerRadius: 24))
+            .padding(40)
+        }
+    }
+
     func addOption() {
         guard !newOptionText.isEmpty else { return }
-        let picked = Theme.randomColorName()
-        withAnimation(Orbit.Dynamics.element) { items.insert(Item(text: newOptionText, colorName: picked), at: 0) }
+        _ = withAnimation(Orbit.Dynamics.element) { items.insert(Item(text: newOptionText, colorName: Theme.randomColorName()), at: 0) }
         newOptionText = ""
+    }
+    
+    func deleteItem(_ item: Item) {
+        if let index = items.firstIndex(where: { $0.id == item.id }) {
+            _ = withAnimation(Orbit.Dynamics.element) { items.remove(at: index) }
+            Haptics.shared.selectionRemoved()
+        }
     }
 }

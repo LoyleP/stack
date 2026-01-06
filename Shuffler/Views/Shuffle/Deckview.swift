@@ -7,46 +7,50 @@ struct DeckView: View {
     // UI State
     @State private var newOptionText = ""
     @State private var showInput = false
-    @State private var showList = false
-    @State private var showSaved = false
     @State private var isKeyboardVisible = false
-    @State private var dragOffset: CGSize = .zero
     @State private var isHolding = false
     @State private var isTapping = false
     @State private var lastPressTime: Date = Date()
+    @State private var selectedTab: Int = 1
+    @State private var dragOffset: CGSize = .zero
     
     @FocusState private var isInputFocused: Bool
+    
+    
 
     var body: some View {
-        GeometryReader { geometry in
-            ZStack {
-                // PANEL 1: Options List (The Left Pane)
-                // Slides in from the left (starts at -width)
-                OptionsListView(items: $viewModel.items, isPresented: $showList)
-                    .frame(width: geometry.size.width, height: geometry.size.height)
-                    .offset(x: showList ? 0 : -geometry.size.width)
-                
-                // PANEL 2: Home Page Content (The Center Pane)
-                // Pushes right if list is open, pushes left if saved is open
-                homeContent(geometry: geometry)
-                    .offset(x: showList ? geometry.size.width : (showSaved ? -geometry.size.width : 0))
-                
-                // PANEL 3: Saved Page (The Right Pane)
-                // Slides in from the right (starts at +width)
-                SavedDecksView(isPresented: $showSaved) { selectedItems in
-                    withAnimation(Orbit.Dynamics.physics) {
-                        viewModel.items = selectedItems
-                    }
-                    viewModel.saveItems()
-                    withAnimation(Orbit.Dynamics.panel) { showSaved = false }
+        TabView(selection: $selectedTab) {
+            // LEFT TAB: OPTIONS
+            OptionsListView(items: $viewModel.items, isPresented: .constant(true))
+                .environmentObject(store)
+                .tabItem {
+                    Label("Options", systemImage: "list.bullet")
                 }
-                .frame(width: geometry.size.width, height: geometry.size.height)
-                .offset(x: showSaved ? 0 : geometry.size.width)
+                .tag(0)
+
+            // CENTER TAB: SHUFFLE (HOME)
+            GeometryReader { geometry in
+                homeContent(geometry: geometry)
             }
-            // All transitions use the signature Orbit Panel dynamics
-            .animation(Orbit.Dynamics.panel, value: showSaved)
-            .animation(Orbit.Dynamics.panel, value: showList)
+            .tabItem {
+                Label("Shuffle", systemImage: "shuffle")
+            }
+            .tag(1)
+
+            // RIGHT TAB: SAVED
+            SavedDecksView(isPresented: .constant(true)) { selectedItems in
+                withAnimation(Orbit.Dynamics.physics) {
+                    viewModel.items = selectedItems
+                }
+                viewModel.saveItems()
+                selectedTab = 1 // Switch back to Home after picking a deck
+            }
+            .tabItem {
+                Label("Saved", systemImage: "rectangle.stack.fill")
+            }
+            .tag(2)
         }
+        .tint(.white) // Makes the active icon white
         .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { _ in isKeyboardVisible = true }
         .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in isKeyboardVisible = false }
         .onShake { viewModel.performShortShuffle() }
@@ -73,15 +77,15 @@ struct DeckView: View {
     private var headerLayer: some View {
         VStack {
             HStack {
-                // Left Button opens the Left Pane
-                Button(action: { withAnimation(Orbit.Dynamics.panel) { showList = true } }) {
+                // Left Button now switches to the Options Tab (Tag 0)
+                Button(action: { selectedTab = 0 }) {
                     Image(systemName: "list.bullet")
                 }.buttonStyle(.orbitGlass)
                 
                 Spacer()
                 
-                // Right Button opens the Right Pane
-                Button(action: { withAnimation(Orbit.Dynamics.panel) { showSaved = true } }) {
+                // Right Button now switches to the Saved Tab (Tag 2)
+                Button(action: { selectedTab = 2 }) {
                     Image(systemName: "rectangle.stack.fill")
                 }.buttonStyle(.orbitGlass)
             }

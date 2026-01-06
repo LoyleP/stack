@@ -8,16 +8,13 @@ struct SavedDecksView: View {
     var body: some View {
         ZStack {
             // Full screen background matching the app's dark theme
-            Color(red: 0.05, green: 0.06, blue: 0.07).ignoresSafeArea()
+            Color(red: 0.05, green: 0.06, blue: 0.07)
             
             VStack(spacing: 0) {
                 // Symmetrical Header
                 HStack {
                     Text("Saved Decks").font(Orbit.headingFont()).foregroundStyle(.white)
                     Spacer()
-                    Button(action: { withAnimation(Orbit.Dynamics.panel) { isPresented = false } }) {
-                        Image(systemName: "xmark").font(.system(size: 16, weight: .bold))
-                    }.buttonStyle(.orbitGlass)
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 24)
@@ -38,6 +35,7 @@ struct SavedDecksView: View {
                             }
                         }
                         .padding(20)
+                        .background(Color(red: 0.05, green: 0.06, blue: 0.07).ignoresSafeArea())
                     }
                 }
             }
