@@ -7,74 +7,101 @@ struct OptionsListView: View {
     @State private var usedSessionColors: Set<String> = []
     @FocusState private var isInputFocused: Bool
     @State private var showClearConfirmation = false
-    @AppStorage("hasSeenOnboarding") var hasSeenOnboarding: Bool = false
     
     var body: some View {
         ZStack {
-            Color(red: 0.1, green: 0.1, blue: 0.1).ignoresSafeArea()
-            VStack(spacing: 20) {
+            // Full screen background
+            Color(red: 0.05, green: 0.06, blue: 0.07).ignoresSafeArea()
+            
+            VStack(spacing: 0) {
+                // Symmetrical Header (Left Align Title, Right Align Back Button)
                 HStack {
-                    if !items.isEmpty {
-                        Button(action: { withAnimation(Orbit.Dynamics.panel) { showClearConfirmation = true }; Haptics.shared.play(.light) }) {
-                            Text("Clear All").font(Orbit.bodyFont()).foregroundStyle(.red.opacity(0.8))
-                        }
-                    }
+                    Text("Deck Options").font(Orbit.headingFont()).foregroundStyle(.white)
                     Spacer()
-                    Button(action: { withAnimation(Orbit.Dynamics.panel) { isPresented = false } }) { Image(systemName: "checkmark") }.buttonStyle(.orbitGlass)
+                    Button(action: { withAnimation(Orbit.Dynamics.panel) { isPresented = false } }) {
+                        Image(systemName: "chevron.right").font(.system(size: 16, weight: .bold))
+                    }.buttonStyle(.orbitGlass)
                 }
+                .padding(.horizontal, 20)
+                .padding(.top, 24)
+                .padding(.bottom, 20)
+                
+                // Content
                 VStack {
                     if items.isEmpty {
-                        Spacer(); VStack(spacing: 32) {
-                            VStack(spacing: 16) { Image(systemName: "square.stack.3d.up.slash").font(.system(size: 60)).foregroundStyle(.white.opacity(0.2)); Text("Your deck is empty.").font(Orbit.headingFont()).foregroundStyle(.white.opacity(0.5)) }
-                            debugSection
-                        }; Spacer()
-                    } else { ScrollView { LazyVStack(spacing: 16) { ForEach(items) { itemRow(for: $0) }; debugSection } }.scrollDismissesKeyboard(.interactively) }
+                        emptyState
+                    } else {
+                        List {
+                            Section {
+                                ForEach(items) { item in
+                                    itemRow(for: item)
+                                }
+                                .onDelete { indexSet in
+                                    items.remove(atOffsets: indexSet)
+                                    Haptics.shared.selectionRemoved()
+                                }
+                            } header: {
+                                if !items.isEmpty {
+                                    Button("Clear All") { showClearConfirmation = true }
+                                        .font(.caption).foregroundStyle(.red)
+                                }
+                            }
+                        }
+                        .listStyle(.insetGrouped)
+                        .scrollContentBackground(.hidden)
+                    }
                 }
+                
+                // Floating Input Bar
                 ControlBar(text: $newOptionText, focusState: $isInputFocused, onAdd: addOption, onShuffle: {})
+                    .padding(20)
             }
-            .padding(16).blur(radius: showClearConfirmation ? 10 : 0).animation(Orbit.Dynamics.element, value: showClearConfirmation)
+            .blur(radius: showClearConfirmation ? 10 : 0)
             
             if showClearConfirmation {
-                ZStack {
-                    Color.black.opacity(0.4).ignoresSafeArea().transition(.opacity).onTapGesture { withAnimation(Orbit.Dynamics.panel) { showClearConfirmation = false } }
-                    VStack(spacing: 24) {
-                        VStack(spacing: 8) { Text("Clear Deck?").font(Orbit.headingFont()); Text("This will remove all options permanently.").font(Orbit.bodyFont()).multilineTextAlignment(.center).foregroundStyle(.white.opacity(0.7)) }
-                        VStack(spacing: 12) {
-                            Button(action: { withAnimation(Orbit.Dynamics.panel) { items.removeAll(); showClearConfirmation = false; Haptics.shared.selectionRemoved() } }) { Text("Clear All").font(Orbit.bodyFont()).foregroundStyle(.white).frame(maxWidth: .infinity).frame(height: 50).background(Color.red.opacity(0.8)).clipShape(Capsule()) }
-                            Button(action: { withAnimation(Orbit.Dynamics.panel) { showClearConfirmation = false } }) { Text("Cancel").font(Orbit.bodyFont()).foregroundStyle(.white).frame(maxWidth: .infinity).frame(height: 50).background(Orbit.glassMaterial).clipShape(Capsule()).overlay(Capsule().stroke(Orbit.glassBorder, lineWidth: Orbit.glassBorderWidth)) }
-                        }
-                    }
-                    .padding(24).background(Orbit.glassMaterial).clipShape(RoundedRectangle(cornerRadius: 32, style: .continuous)).overlay(RoundedRectangle(cornerRadius: 32, style: .continuous).stroke(Orbit.glassBorder, lineWidth: Orbit.glassBorderWidth)).padding(.horizontal, 40).transition(.scale(scale: 0.9).combined(with: .opacity)).zIndex(10)
-                }
+                clearAlertOverlay
             }
         }
-        .preferredColorScheme(.dark).onAppear { usedSessionColors.removeAll() }
+        .preferredColorScheme(.dark)
+    }
+    
+    // MARK: - Components
+    
+    private var emptyState: some View {
+        VStack(spacing: 16) {
+            Spacer()
+            Image(systemName: "square.stack.3d.up.slash").font(.system(size: 50)).foregroundStyle(.white.opacity(0.2))
+            Text("No options yet").font(Orbit.bodyFont()).foregroundStyle(.white.opacity(0.4))
+            Spacer()
+        }
     }
 
-    private var debugSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("DEVELOPER SETTINGS").font(.system(size: 12, weight: .bold, design: .rounded)).foregroundStyle(.white.opacity(0.3)).padding(.leading, 12)
-            HStack {
-                Image(systemName: "eye.fill").foregroundStyle(Theme.color(for: "denim"))
-                Text("Show Onboarding").font(Orbit.bodyFont()).foregroundStyle(.white); Spacer()
-                Toggle("", isOn: Binding(get: { !hasSeenOnboarding }, set: { hasSeenOnboarding = !$0 })).labelsHidden().tint(Theme.color(for: "denim"))
-            }.padding(.vertical, 16).padding(.horizontal, 20).background(.ultraThinMaterial).clipShape(Capsule()).overlay(Capsule().stroke(.white.opacity(0.2), lineWidth: 1))
-        }.padding(.top, 24).padding(.horizontal, 4)
+    private func itemRow(for item: Item) -> some View {
+        HStack {
+            Circle().fill(item.color).frame(width: 12, height: 12)
+            Text(item.text).font(Orbit.bodyFont()).foregroundStyle(.white)
+        }
+        .listRowBackground(Rectangle().fill(.ultraThinMaterial))
     }
 
-    func itemRow(for item: Item) -> some View {
-        HStack(spacing: 16) {
-            Circle().fill(item.color).frame(width: 22, height: 22).shadow(color: item.color.opacity(0.6), radius: 4)
-            Text(item.text).font(Orbit.bodyFont()).foregroundStyle(.white); Spacer()
-            Button(action: { withAnimation(Orbit.Dynamics.element) { items.removeAll { $0.id == item.id }; Haptics.shared.selectionRemoved() } }) { Image(systemName: "xmark.circle.fill").font(.system(size: 22)).foregroundStyle(.white.opacity(0.3)) }.buttonStyle(.plain)
-        }.padding(.vertical, 16).padding(.horizontal, 20).background(.ultraThinMaterial).clipShape(Capsule()).overlay(Capsule().stroke(.white.opacity(0.2), lineWidth: 1))
+    private var clearAlertOverlay: some View {
+        ZStack {
+            Color.black.opacity(0.4).ignoresSafeArea().onTapGesture { showClearConfirmation = false }
+            VStack(spacing: 24) {
+                Text("Clear everything?").font(Orbit.headingFont())
+                HStack(spacing: 16) {
+                    Button("Cancel") { showClearConfirmation = false }.buttonStyle(.plain)
+                    Button("Clear All") { items.removeAll(); showClearConfirmation = false }.foregroundStyle(.red)
+                }
+            }
+            .padding(24).background(Orbit.glassMaterial).clipShape(RoundedRectangle(cornerRadius: 24))
+        }
     }
 
     func addOption() {
         guard !newOptionText.isEmpty else { return }
-        if items.contains(where: { $0.text.localizedCaseInsensitiveCompare(newOptionText) == .orderedSame }) { newOptionText = ""; return }
-        let picked = Theme.colorNames.filter { !usedSessionColors.contains($0) }.randomElement() ?? "denim"
-        usedSessionColors.insert(picked); withAnimation(Orbit.Dynamics.element) { items.insert(Item(text: newOptionText, colorName: picked), at: 0) }
-        newOptionText = ""; isInputFocused = true
+        let picked = Theme.randomColorName()
+        withAnimation(Orbit.Dynamics.element) { items.insert(Item(text: newOptionText, colorName: picked), at: 0) }
+        newOptionText = ""
     }
 }

@@ -2,27 +2,34 @@ import SwiftUI
 
 struct SavedDecksView: View {
     @EnvironmentObject var store: DeckStore
-    @Binding var selectedTab: Int
-    @State private var showingSaveAlert = false
-    @State private var newDeckName = ""
-
+    @Binding var isPresented: Bool
+    var onSelect: ([Item]) -> Void
+    
     var body: some View {
         ZStack {
+            // Full screen background matching the app's dark theme
             Color(red: 0.05, green: 0.06, blue: 0.07).ignoresSafeArea()
             
-            VStack(spacing: 20) {
-                // Header
+            VStack(spacing: 0) {
+                // Symmetrical Header
                 HStack {
-                    Text("My Decks").font(Orbit.headingFont()).foregroundStyle(.white)
+                    Text("Saved Decks").font(Orbit.headingFont()).foregroundStyle(.white)
                     Spacer()
-                    Button(action: { showingSaveAlert = true }) {
-                        Image(systemName: "plus.circle.fill").font(.title2).foregroundStyle(Theme.color(for: "denim"))
-                    }
+                    Button(action: { withAnimation(Orbit.Dynamics.panel) { isPresented = false } }) {
+                        Image(systemName: "xmark").font(.system(size: 16, weight: .bold))
+                    }.buttonStyle(.orbitGlass)
                 }
-                .padding(.horizontal, 20).padding(.top, 20)
-
+                .padding(.horizontal, 20)
+                .padding(.top, 24)
+                .padding(.bottom, 20)
+                
                 if store.savedDecks.isEmpty {
-                    emptyState
+                    Spacer()
+                    VStack(spacing: 12) {
+                        Image(systemName: "tray").font(.system(size: 40)).foregroundStyle(.white.opacity(0.2))
+                        Text("No saved decks yet").font(Orbit.bodyFont()).foregroundStyle(.white.opacity(0.3))
+                    }
+                    Spacer()
                 } else {
                     ScrollView {
                         LazyVStack(spacing: 16) {
@@ -33,48 +40,24 @@ struct SavedDecksView: View {
                         .padding(20)
                     }
                 }
-                Spacer()
             }
-        }
-        .alert("Save Current Deck", isPresented: $showingSaveAlert) {
-            TextField("Deck Name", text: $newDeckName)
-            Button("Save") {
-                store.saveCurrentAsNew(name: newDeckName)
-                newDeckName = ""
-            }
-            Button("Cancel", role: .cancel) { newDeckName = "" }
-        } message: {
-            Text("Enter a name for your current set of options.")
-        }
-    }
-
-    private var emptyState: some View {
-        VStack(spacing: 12) {
-            Spacer()
-            Image(systemName: "tray.full").font(.system(size: 40)).foregroundStyle(.white.opacity(0.2))
-            Text("No saved decks yet.").font(Orbit.bodyFont()).foregroundStyle(.white.opacity(0.4))
-            Spacer()
         }
     }
 
     private func deckRow(for deck: Deck) -> some View {
-        Button(action: {
-            store.selectDeck(deck)
-            withAnimation(Orbit.Dynamics.panel) { selectedTab = 0 }
-            Haptics.shared.play(.medium)
-        }) {
-            HStack(spacing: 16) {
+        Button(action: { onSelect(deck.items); Haptics.shared.play(.medium) }) {
+            HStack {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(deck.name).font(Orbit.bodyFont()).foregroundStyle(.white)
                     Text("\(deck.items.count) options").font(.caption).foregroundStyle(.white.opacity(0.5))
                 }
                 Spacer()
-                Image(systemName: "chevron.right").font(.system(size: 14, weight: .bold)).foregroundStyle(.white.opacity(0.3))
+                Image(systemName: "chevron.right").font(.system(size: 14, weight: .bold)).foregroundStyle(.white.opacity(0.2))
             }
             .padding(20)
             .background(Orbit.glassMaterial)
             .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: 24, style: .continuous).stroke(Orbit.glassBorder, lineWidth: Orbit.glassBorderWidth))
+            .overlay(RoundedRectangle(cornerRadius: 24, style: .continuous).stroke(Orbit.glassBorder, lineWidth: 1))
         }
         .buttonStyle(.plain)
     }
