@@ -6,13 +6,16 @@ struct ShufflerApp: App {
     
     var body: some Scene {
         WindowGroup {
-            if hasSeenOnboarding {
-                DeckView()
-                    .transition(.opacity.combined(with: .scale))
-            } else {
-                OnboardingView()
-                    .transition(.opacity)
+            ZStack {
+                if hasSeenOnboarding {
+                    DeckView()
+                        .transition(.asymmetric(insertion: .scale(scale: 0.95).combined(with: .opacity), removal: .opacity))
+                } else {
+                    OnboardingView()
+                        .transition(.opacity)
+                }
             }
+            .animation(Orbit.Dynamics.background, value: hasSeenOnboarding)
         }
     }
 }
