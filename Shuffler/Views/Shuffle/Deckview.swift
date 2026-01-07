@@ -11,106 +11,91 @@ struct DeckView: View {
     @State private var isHolding = false
     @State private var isTapping = false
     @State private var lastPressTime: Date = Date()
-    @State private var selectedTab: Int = 1
+    @State private var showOptionsDrawer = false
+    
+    // 0: Saved (Left), 1: Home (Center)
+    @State private var selectedPage: Int = 1
     @State private var dragOffset: CGSize = .zero
     
     @FocusState private var isInputFocused: Bool
-    
-    
 
     var body: some View {
-        TabView(selection: $selectedTab) {
-            // LEFT TAB: OPTIONS
-            OptionsListView(items: $viewModel.items, isPresented: .constant(true))
-                .environmentObject(store)
-                .tabItem {
-                    Label("Options", systemImage: "list.bullet")
+        ZStack(alignment: .top) {
+            // Root background ignores safe area to maintain the "Dark Zone" fix
+            Color(red: 0.05, green: 0.06, blue: 0.07).ignoresSafeArea()
+            
+            TabView(selection: $selectedPage) {
+                SavedDecksView(isPresented: .constant(true)) { selectedItems in
+                    withAnimation(Orbit.Dynamics.physics) { viewModel.items = selectedItems }
+                    viewModel.saveItems()
+                    withAnimation(Orbit.Dynamics.panel) { selectedPage = 1 }
                 }
                 .tag(0)
 
-            // CENTER TAB: SHUFFLE (HOME)
-            GeometryReader { geometry in
-                homeContent(geometry: geometry)
+                homeContent()
+                    .tag(1)
             }
-            .tabItem {
-                Label("Shuffle", systemImage: "shuffle")
-            }
-            .tag(1)
-
-            // RIGHT TAB: SAVED
-            SavedDecksView(isPresented: .constant(true)) { selectedItems in
-                withAnimation(Orbit.Dynamics.physics) {
-                    viewModel.items = selectedItems
-                }
-                viewModel.saveItems()
-                selectedTab = 1 // Switch back to Home after picking a deck
-            }
-            .tabItem {
-                Label("Saved", systemImage: "rectangle.stack.fill")
-            }
-            .tag(2)
+            .tabViewStyle(.page(indexDisplayMode: .never))
+            // IMPORTANT: This prevents the system from "snapping" the whole screen up
+            .ignoresSafeArea(.keyboard)
+            
+            pageIndicator
+                .padding(.top, 12)
+                .zIndex(10)
         }
-        .tint(.white) // Makes the active icon white
-        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { _ in isKeyboardVisible = true }
-        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in isKeyboardVisible = false }
+        .sheet(isPresented: $showOptionsDrawer) {
+            OptionsListView(items: $viewModel.items, isPresented: $showOptionsDrawer)
+                .environmentObject(store)
+                .presentationDetents([.medium, .large])
+                .presentationDragIndicator(.visible)
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { _ in
+            // Unified manual animation trigger
+            withAnimation(.spring(response: 0.42, dampingFraction: 0.85)) { isKeyboardVisible = true }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in
+            withAnimation(.spring(response: 0.42, dampingFraction: 0.85)) { isKeyboardVisible = false }
+        }
         .onShake { viewModel.performShortShuffle() }
     }
     
-    // MARK: - Core Layouts
+    private var pageIndicator: some View {
+        HStack(spacing: 8) {
+            ForEach(0..<2) { index in
+                Capsule()
+                    .fill(selectedPage == index ? Color.white : Color.white.opacity(0.2))
+                    .frame(width: selectedPage == index ? 20 : 6, height: 6)
+            }
+        }
+    }
     
     @ViewBuilder
-    private func homeContent(geometry: GeometryProxy) -> some View {
+    private func homeContent() -> some View {
         ZStack {
             backgroundLayer
             
             cardLayer
-                .ignoresSafeArea()
-                .offset(y: -20)
+                .offset(y: isKeyboardVisible ? -100 : -20) // Manually lifting cards higher
             
-            headerLayer
+            // Top Right Button
+            VStack {
+                HStack {
+                    Spacer()
+                    Button(action: {
+                        Haptics.shared.play(.light)
+                        showOptionsDrawer = true
+                    }) {
+                        Image(systemName: "list.bullet")
+                    }
+                    .buttonStyle(.orbitGlass)
+                    .padding(.trailing, 20)
+                    .padding(.top, 40)
+                    .opacity(isKeyboardVisible ? 0 : 1) // Hide when typing to clean UI
+                }
+                Spacer()
+            }
             
             controlLayer
-        }
-        .frame(width: geometry.size.width, height: geometry.size.height)
-    }
-
-    private var headerLayer: some View {
-        VStack {
-            HStack {
-                // Left Button now switches to the Options Tab (Tag 0)
-                Button(action: { selectedTab = 0 }) {
-                    Image(systemName: "list.bullet")
-                }.buttonStyle(.orbitGlass)
-                
-                Spacer()
-                
-                // Right Button now switches to the Saved Tab (Tag 2)
-                Button(action: { selectedTab = 2 }) {
-                    Image(systemName: "rectangle.stack.fill")
-                }.buttonStyle(.orbitGlass)
-            }
-            .padding(.horizontal, 20)
-            .padding(.top, 8)
-            Spacer()
-        }
-    }
-
-    // MARK: - Home Components (Background, Cards, Controls)
-    // Same implementation as before, keeping the logic clean
-
-    private var backgroundLayer: some View {
-        LinearGradient(
-            colors: [viewModel.items.last?.color.opacity(0.35) ?? .gray.opacity(0.1), Color(red: 0.05, green: 0.06, blue: 0.07)],
-            startPoint: .topLeading, endPoint: .bottomTrailing
-        )
-        .ignoresSafeArea()
-        .animation(Orbit.Dynamics.background, value: viewModel.items.last?.id)
-        .onTapGesture {
-            if showInput {
-                isInputFocused = false
-                hideKeyboard()
-                withAnimation(Orbit.Dynamics.panel) { showInput = false }
-            }
         }
     }
 
@@ -131,16 +116,8 @@ struct DeckView: View {
                 }
             }
         }
-        .scaleEffect(isKeyboardVisible ? 0.7 : 1.0)
-        .animation(Orbit.Dynamics.panel, value: isKeyboardVisible)
-        .animation(Orbit.Dynamics.physics, value: viewModel.items.map { $0.id })
-    }
-
-    private var emptyStateView: some View {
-        VStack(spacing: 16) {
-            Image(systemName: "square.stack.3d.up.slash").font(.system(size: 60)).foregroundStyle(.white.opacity(0.4))
-            Text("No options left.").font(Orbit.headingFont()).foregroundStyle(.white.opacity(0.4))
-        }
+        // DEFAULT SCALE set to 0.75 for extra swipe margin
+        .scaleEffect(isKeyboardVisible ? 0.6 : 0.75)
     }
 
     private var controlLayer: some View {
@@ -148,14 +125,42 @@ struct DeckView: View {
             Spacer()
             if showInput {
                 ControlBar(text: $newOptionText, focusState: $isInputFocused, onAdd: { viewModel.addOption(newOptionText); newOptionText = "" }, onShuffle: viewModel.performShortShuffle)
-                .padding(.bottom, 10).padding(.horizontal, 16).transition(.move(edge: .bottom).combined(with: .opacity))
+                // Offset the bar by keyboard height manually for the "sticky" feel
+                .padding(.bottom, isKeyboardVisible ? 320 : 20)
+                .padding(.horizontal, 16)
+                .transition(.move(edge: .bottom).combined(with: .opacity))
             } else {
                 HStack(spacing: 16) {
                     Button(action: { withAnimation(Orbit.Dynamics.element) { showInput = true; isInputFocused = true } }) { Image(systemName: "plus") }.buttonStyle(.orbitGlass)
                     shuffleButton
                 }
-                .padding(.bottom, 20)
+                .padding(.bottom, 40)
             }
+        }
+    }
+
+    // (Remaining helper functions like backgroundLayer, shuffleButton, dragGesture, etc. remain the same as previous)
+    
+    private var backgroundLayer: some View {
+        LinearGradient(
+            colors: [viewModel.items.last?.color.opacity(0.35) ?? .gray.opacity(0.1), Color(red: 0.05, green: 0.06, blue: 0.07)],
+            startPoint: .topLeading, endPoint: .bottomTrailing
+        )
+        .ignoresSafeArea()
+        .animation(Orbit.Dynamics.background, value: viewModel.items.last?.id)
+        .onTapGesture {
+            if showInput {
+                isInputFocused = false
+                hideKeyboard()
+                withAnimation(Orbit.Dynamics.panel) { showInput = false }
+            }
+        }
+    }
+
+    private var emptyStateView: some View {
+        VStack(spacing: 16) {
+            Image(systemName: "square.stack.3d.up.slash").font(.system(size: 60)).foregroundStyle(.white.opacity(0.4))
+            Text("No options left.").font(Orbit.headingFont()).foregroundStyle(.white.opacity(0.4))
         }
     }
 
@@ -170,7 +175,6 @@ struct DeckView: View {
         .disabled(viewModel.items.isEmpty)
     }
 
-    // MARK: - Helpers
     private var dragGesture: some Gesture {
         DragGesture().onChanged { v in withAnimation(Orbit.Dynamics.gesture) { dragOffset = v.translation } }
             .onEnded { v in

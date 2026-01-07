@@ -6,21 +6,6 @@ struct ShufflerApp: App {
     @StateObject private var store = DeckStore()
     @AppStorage("hasSeenOnboarding") var hasSeenOnboarding: Bool = false
 
-    init() {
-        let appearance = UITabBarAppearance()
-        appearance.configureWithDefaultBackground()
-        // Sets the navbar background to a dark, semi-transparent color
-        appearance.backgroundColor = UIColor(
-            red: 0.05,
-            green: 0.06,
-            blue: 0.07,
-            alpha: 0.85
-        )
-
-        UITabBar.appearance().standardAppearance = appearance
-        UITabBar.appearance().scrollEdgeAppearance = appearance
-    }
-
     var body: some Scene {
         WindowGroup {
             ZStack {

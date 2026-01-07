@@ -2,7 +2,7 @@ import SwiftUI
 
 struct OptionsListView: View {
     @Binding var items: [Item]
-    @Binding var isPresented: Bool // Kept for compatibility with DeckView
+    @Binding var isPresented: Bool // Compatibility for DeckView
     
     @EnvironmentObject var store: DeckStore
     @State private var showSaveDialog = false
@@ -16,34 +16,42 @@ struct OptionsListView: View {
             Color(red: 0.05, green: 0.06, blue: 0.07).ignoresSafeArea()
             
             VStack(spacing: 0) {
-                // Header with Bookmark Icon
+                // Header
                 HStack {
                     Text("Deck Options").font(Orbit.headingFont()).foregroundStyle(.white)
                     Spacer()
                     
+                    // Bookmark for Saving
                     if !items.isEmpty {
                         Button(action: {
-                            _ = withAnimation(Orbit.Dynamics.element) { showSaveDialog = true }
+                            withAnimation(Orbit.Dynamics.element) { showSaveDialog = true }
                         }) {
                             Image(systemName: "bookmark.fill").font(.system(size: 16, weight: .bold))
                         }
                         .buttonStyle(.orbitGlass)
+                        .padding(.trailing, 8)
                     }
+                    
+                    // NEW: Close button for the drawer
+                    Button(action: { isPresented = false }) {
+                        Image(systemName: "xmark").font(.system(size: 16, weight: .bold))
+                    }
+                    .buttonStyle(.orbitGlass)
                 }
                 .padding(.horizontal, 20)
-                .padding(.top, 24)
+                .padding(.top, 24) // Reset padding for drawer context
                 .padding(.bottom, 20)
                 
-                // Content: Separated Card Layout
+                // Card Content
                 VStack {
                     if items.isEmpty {
                         emptyState
                     } else {
                         ScrollView {
-                            LazyVStack(spacing: 12) {
+                            LazyVStack(spacing: 16) {
                                 HStack {
                                     Button("Clear All") {
-                                        _ = withAnimation(Orbit.Dynamics.element) { showClearConfirmation = true }
+                                        withAnimation(Orbit.Dynamics.element) { showClearConfirmation = true }
                                     }
                                     .font(.caption).foregroundStyle(.red)
                                     Spacer()
@@ -56,6 +64,7 @@ struct OptionsListView: View {
                                 }
                             }
                             .padding(.horizontal, 20)
+                            .padding(.bottom, 100)
                         }
                     }
                 }
@@ -102,14 +111,14 @@ struct OptionsListView: View {
     private var clearAlertOverlay: some View {
         ZStack {
             Color.black.opacity(0.4).ignoresSafeArea().onTapGesture {
-                _ = withAnimation(Orbit.Dynamics.element) { showClearConfirmation = false }
+                withAnimation(Orbit.Dynamics.element) { showClearConfirmation = false }
             }
             VStack(spacing: 24) {
                 Text("Clear everything?").font(Orbit.headingFont())
                 HStack(spacing: 16) {
-                    Button("Cancel") { _ = withAnimation(Orbit.Dynamics.element) { showClearConfirmation = false } }.buttonStyle(.plain)
+                    Button("Cancel") { withAnimation(Orbit.Dynamics.element) { showClearConfirmation = false } }.buttonStyle(.plain)
                     Button("Clear All") {
-                        _ = withAnimation(Orbit.Dynamics.element) {
+                        withAnimation(Orbit.Dynamics.element) {
                             items.removeAll()
                             showClearConfirmation = false
                         }
@@ -123,7 +132,7 @@ struct OptionsListView: View {
     private var saveDeckOverlay: some View {
         ZStack {
             Color.black.opacity(0.4).ignoresSafeArea().onTapGesture {
-                _ = withAnimation(Orbit.Dynamics.element) { showSaveDialog = false }
+                withAnimation(Orbit.Dynamics.element) { showSaveDialog = false }
             }
             VStack(spacing: 20) {
                 Text("Save current deck").font(Orbit.headingFont())
@@ -134,11 +143,11 @@ struct OptionsListView: View {
                     .foregroundStyle(.white)
                 
                 HStack(spacing: 16) {
-                    Button("Cancel") { _ = withAnimation(Orbit.Dynamics.element) { showSaveDialog = false } }.buttonStyle(.plain)
+                    Button("Cancel") { withAnimation(Orbit.Dynamics.element) { showSaveDialog = false } }.buttonStyle(.plain)
                     Button("Save") {
                         store.saveCurrentDeck(name: deckName, items: items)
                         deckName = ""
-                        _ = withAnimation(Orbit.Dynamics.element) { showSaveDialog = false }
+                        withAnimation(Orbit.Dynamics.element) { showSaveDialog = false }
                         Haptics.shared.play(.medium)
                     }
                     .font(.headline)
@@ -152,13 +161,13 @@ struct OptionsListView: View {
 
     func addOption() {
         guard !newOptionText.isEmpty else { return }
-        _ = withAnimation(Orbit.Dynamics.element) { items.insert(Item(text: newOptionText, colorName: Theme.randomColorName()), at: 0) }
+        withAnimation(Orbit.Dynamics.element) { items.insert(Item(text: newOptionText, colorName: Theme.randomColorName()), at: 0) }
         newOptionText = ""
     }
     
     func deleteItem(_ item: Item) {
         if let index = items.firstIndex(where: { $0.id == item.id }) {
-            _ = withAnimation(Orbit.Dynamics.element) { items.remove(at: index) }
+            withAnimation(Orbit.Dynamics.element) { items.remove(at: index) }
             Haptics.shared.selectionRemoved()
         }
     }
